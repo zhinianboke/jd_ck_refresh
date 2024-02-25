@@ -10,7 +10,10 @@ function sleep(ms) {
 const timer = ms => new Promise( res => setTimeout(res, ms));
 
 // 变量，填写手机号，使用  @分割  例如：123@456
-var phoneStr = "123@456";
+var phoneStr = "15676374760@18895330368";
+var serverUrl = "ark.leafxxx.win";
+
+
 var codeJiuxu = false;
 var code = "";
 main()
@@ -50,7 +53,7 @@ async function main() {
         
 async function sendCode(phone) {
     console.log(phone + "开始发送验证码");
-	var response = await fetch("https://dy.zhinianboke.com/jd/sendCode?phone="+phone, {
+	var response = await fetch("https://dy.zhinianboke.com/jd/sendCode?phone="+phone+"&serverUrl="+serverUrl, {
       "headers": {
       },
       "body": "",
@@ -69,7 +72,7 @@ async function sendCode(phone) {
 	})
 }
 async function getCode(phone) {
-	var response = await fetch("https://dy.zhinianboke.com/jd/getCode?phone="+phone, {
+	var response = await fetch("https://dy.zhinianboke.com/jd/getCode?phone="+phone+"&serverUrl="+serverUrl, {
       "headers": {
       },
       "body": "",
@@ -88,7 +91,7 @@ async function getCode(phone) {
 	})
 }
 async function loginJd(phone,code) {
-	var response = await fetch("https://dy.zhinianboke.com/jd/loginJd?phone="+phone + "&code="+code, {
+	var response = await fetch("https://dy.zhinianboke.com/jd/loginJd?phone="+phone + "&code="+code+"&serverUrl="+serverUrl, {
       "headers": {
       },
       "body": "",
