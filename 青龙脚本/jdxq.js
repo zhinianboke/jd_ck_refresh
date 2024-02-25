@@ -29,12 +29,12 @@ async function main() {
 	        await sendCode(phone)
             
 	        if(codeJiuxu) {
-	            for(var j=0;j < 15;j++) {
+	            for(var j=0;j < 20;j++) {
 	                if(code) {
 	                    break;
 	                }
 	                console.log(phone + "开始第"+(j+1)+"次获取验证码");
-	                await sleepAsync(1500);
+	                await sleepAsync(1800);
 	                if(!code) {
 	                    await getCode(phone);
 	                }
