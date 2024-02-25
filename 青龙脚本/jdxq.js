@@ -10,7 +10,8 @@ function sleep(ms) {
 const timer = ms => new Promise( res => setTimeout(res, ms));
 
 // 变量，填写手机号，使用  @分割  例如：123@456
-var phoneStr = "15676374760@18895330368";
+var phoneStr = "123@456";
+// 车队,可填写 ark.leafxxx.win  或者 login.ouklc.com
 var serverUrl = "ark.leafxxx.win";
 
 
@@ -28,12 +29,12 @@ async function main() {
 	        await sendCode(phone)
             
 	        if(codeJiuxu) {
-	            for(var j=0;j < 15;j++) {
+	            for(var j=0;j < 20;j++) {
 	                if(code) {
 	                    break;
 	                }
 	                console.log(phone + "开始第"+(j+1)+"次获取验证码");
-	                await sleepAsync(1500);
+	                await sleepAsync(1800);
 	                if(!code) {
 	                    await getCode(phone);
 	                }
