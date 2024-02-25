@@ -10,7 +10,7 @@ function sleep(ms) {
 const timer = ms => new Promise( res => setTimeout(res, ms));
 
 // 变量，填写手机号，使用  @分割  例如：123@456
-var phoneStr = "15676374760@18895330368";
+var phoneStr = "123@456";
 var serverUrl = "ark.leafxxx.win";
 
 
