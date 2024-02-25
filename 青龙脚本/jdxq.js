@@ -11,6 +11,7 @@ const timer = ms => new Promise( res => setTimeout(res, ms));
 
 // 变量，填写手机号，使用  @分割  例如：123@456
 var phoneStr = "123@456";
+// 车队,可填写 ark.leafxxx.win  或者 login.ouklc.com
 var serverUrl = "ark.leafxxx.win";
 
 
