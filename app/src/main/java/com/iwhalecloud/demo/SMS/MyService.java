@@ -62,7 +62,6 @@ public class MyService extends Service {
 
     private String message;
 
-    private Callback callback;
     @Override
     public IBinder onBind(Intent intent) {
         return new MyBinder();
@@ -78,23 +77,13 @@ public class MyService extends Service {
         }
     }
 
-    public void setCallback(Callback callback) {
-        this.callback = callback;
-    }
-
-    public static interface Callback {
-        void onDataChange(String data);
-    }
 
     public void writeMessage(String tempMsg) {
 
-        Intent intent = new Intent(this, MyService.class);
+
+        Intent intent = new Intent("com.gdp2852.demo.service.broadcast");
         intent.putExtra("message", tempMsg);
-
-        if (callback != null) {
-                                   callback.onDataChange(tempMsg);
-        }
-
+        sendBroadcast(intent);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)

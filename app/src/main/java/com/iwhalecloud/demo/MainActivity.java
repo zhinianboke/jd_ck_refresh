@@ -38,13 +38,19 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class MainActivity extends AppCompatActivity implements
-          ServiceConnection{
+public class MainActivity extends AppCompatActivity {
 
 
     private static final String TAG = "CC";
     final private int REQUEST_CODE_ASK_PERMISSIONS = 1;
     private boolean serviceFlag = false;
+
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            TextView tv = (TextView) findViewById(R.id.myTextView);
+            tv.setText(intent.getExtras().getString("message"));
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -66,31 +72,16 @@ public class MainActivity extends AppCompatActivity implements
         v2.setText(phoneNum2);
         ToggleButton tb = findViewById(R.id.button);
         TextView messageVw = findViewById(R.id.myTextView);
-        messageVw.setText("asdfsdf");
 
-        Handler handler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-                messageVw.setText(msg.obj.toString());
-            }
-        };
         //在类里声明一个Handler
-        Handler mTimeHandler = new Handler() {
-            public void handleMessage(Message msg) {
-                if (msg.what == 0) {
-                    String message = getIntent().getStringExtra("message");
-                    Log.i(TAG, "message" + message);
-                    messageVw.setText(message);
-                    sendEmptyMessageDelayed(0, 1000);
-                }
-            }
-        };
-        //在onCreate的类似的方法里面启动这个Handler就可以了：
-
 
 
 // 在Service中读取数据
+
+
+
+        IntentFilter filter = new IntentFilter("com.gdp2852.demo.service.broadcast");
+        registerReceiver(receiver, filter);
 
 
 
@@ -119,14 +110,12 @@ public class MainActivity extends AppCompatActivity implements
                     pn.setEnabled(false);
                     httpUrl.setEnabled(false);
                     Log.i(TAG, "服务开启");
-//                    mTimeHandler.sendEmptyMessageDelayed(0, 1000);
                     Toast.makeText(MainActivity.this,"服务开启",Toast.LENGTH_SHORT).show();
                 }else {
                     Intent service = new Intent(getApplicationContext(), MyService.class);
                     MainActivity.this.stopService(service);
                     pn.setEnabled(true);
                     httpUrl.setEnabled(true);
-                    mTimeHandler.removeCallbacksAndMessages(null);
                     Toast.makeText(MainActivity.this,"服务停止",Toast.LENGTH_SHORT).show();
                 }
             }
@@ -153,24 +142,4 @@ public class MainActivity extends AppCompatActivity implements
         this.stopService(service);
     }
 
-    @Override
-    public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-        MyService.MyBinder binder = (MyService.MyBinder) MyService.class;
-              MyService myService = binder.getService();
-                 myService.setCallback(new MyService.Callback() {
-         @Override
-             public void onDataChange(String data) {
-                                 Message msg = new Message();
-                                 msg.obj = data;
-                                 handler.sendMessage(msg);
-                             }
-         });
-    }
-
-
-
-    @Override
-    public void onServiceDisconnected(ComponentName componentName) {
-
-    }
 }
