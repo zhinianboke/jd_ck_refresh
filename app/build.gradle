@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace 'com.iwhalecloud.demo'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.iwhalecloud.demo"
@@ -27,7 +27,7 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-    buildToolsVersion '33.0.1'
+    buildToolsVersion '34.0.0'
 }
 
 dependencies {

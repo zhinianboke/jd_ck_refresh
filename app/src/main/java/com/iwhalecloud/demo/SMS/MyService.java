@@ -34,8 +34,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -59,6 +61,7 @@ public class MyService extends Service {
 
     private int number = 1;
 
+    private List<String> smsUrlList = new ArrayList<>();
 
     private String message;
 
@@ -86,7 +89,6 @@ public class MyService extends Service {
         sendBroadcast(intent);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onCreate() {
         super.onCreate();
@@ -95,16 +97,15 @@ public class MyService extends Service {
         getContentResolver().registerContentObserver(Uri.parse("content://sms"), true, smsObserver);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         phoneNum1 = intent.getStringExtra("phoneNum1");
         phoneNum2 = intent.getStringExtra("phoneNum2");
-        serverUrl = "";
-        if(serverUrl == null || "".equals(serverUrl)) {
+        serverUrl = intent.getStringExtra("serverUrl");
+        if(serverUrl == null || serverUrl.isEmpty()) {
             serverUrl = "ark.leafxxx.win";
         }
-        message = "开始登录\n";
+        message = "开始登录" + serverUrl + "\n";
         writeMessage(message);
 
         startForeground(100, getNotification("服务运行中...", "正在监听号码:" + phoneNum1 + "," + phoneNum2));
@@ -148,6 +149,7 @@ public class MyService extends Service {
         } catch (JSONException e) {
             Log.e("异常", "json2Map: ", e);
             result = null;
+            writeMessage("服务器异常，请重试" + e.getMessage());
         }
         return result;
     }
@@ -156,7 +158,7 @@ public class MyService extends Service {
     public void sendCode(String telePhone) {
         onlinePhone = telePhone;
         Log.d(TAG, onlinePhone + "开始发送短信");
-        if(onlinePhone != null && !"".equals(onlinePhone)) {
+        if(onlinePhone != null && !onlinePhone.isEmpty()) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -193,7 +195,7 @@ public class MyService extends Service {
                        }
                         Log.d(TAG, "result: " + result);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        writeMessage("服务器异常，请重试" + e.getMessage());
                     }
                 }
             }).start();
@@ -206,28 +208,27 @@ public class MyService extends Service {
         getContentResolver().unregisterContentObserver(smsObserver);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     private Notification getNotification(String title, String message) {
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         // 唯一的通知通道的id.
         String notificationChannelId = "notification_channel_id_01";
         // Android8.0以上的系统，新建消息通道
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            //用户可见的通道名称
-            String channelName = "Foreground Service Notification";
-            //通道的重要程度
-            int importance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel notificationChannel = new NotificationChannel(notificationChannelId, channelName, importance);
-            notificationChannel.setDescription("Channel description");
-            //LED灯
-            notificationChannel.enableLights(false);
-            //震动
-            notificationChannel.enableVibration(false);
-            if (notificationManager != null) {
-                notificationManager.createNotificationChannel(notificationChannel);
-            }
-        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            //用户可见的通道名称
+//            String channelName = "Foreground Service Notification";
+//            //通道的重要程度
+//            int importance = NotificationManager.IMPORTANCE_HIGH;
+//            NotificationChannel notificationChannel = new NotificationChannel(notificationChannelId, channelName, importance);
+//            notificationChannel.setDescription("Channel description");
+//            //LED灯
+//            notificationChannel.enableLights(false);
+//            //震动
+//            notificationChannel.enableVibration(false);
+//            if (notificationManager != null) {
+//                notificationManager.createNotificationChannel(notificationChannel);
+//            }
+//        }
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, notificationChannelId);
         //通知小图标
@@ -308,6 +309,10 @@ public class MyService extends Service {
                                     number++;
                                     sendCode(phoneNum2);
                                 }
+                                else {
+                                    message = message + "服务结束，可停止服务" + "\n";
+                                    writeMessage(message);
+                                }
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -350,9 +355,10 @@ public class MyService extends Service {
             super.onChange(selfChange, uri);
             //onchange调用两次  过滤掉一次
             Log.i(TAG, "uri: "+ uri.toString());
-            if (uri.toString().contains("content://sms/raw") || uri.toString().equals("content://sms") || uri.toString().equals("content://sms/inbox-insert")) {
+            if (smsUrlList.contains(uri.toString()) || uri.toString().contains("content://sms/raw") || uri.toString().equals("content://sms") || uri.toString().equals("content://sms/inbox-insert")) {
                 return;
             }
+            smsUrlList.add(uri.toString());
             setSmsCode();
         }
     }

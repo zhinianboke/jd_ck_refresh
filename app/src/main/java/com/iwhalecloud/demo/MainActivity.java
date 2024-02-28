@@ -19,6 +19,9 @@ import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -38,12 +41,20 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity  implements  AdapterView.OnItemSelectedListener {
 
 
     private static final String TAG = "CC";
     final private int REQUEST_CODE_ASK_PERMISSIONS = 1;
     private boolean serviceFlag = false;
+
+    private Spinner sp_dropdown;
+
+    private String serverUrl;
+
+    //定义下拉列表需要显示的文本数组
+    private final static String[] starArray = {"ark.leafxxx.win", "login.ouklc.com"};
+
 
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
@@ -65,18 +76,35 @@ public class MainActivity extends AppCompatActivity {
         if (read.getString("phoneNum2",null)!=null){
             phoneNum2 = read.getString("phoneNum2",null);
         }
-        Log.i(TAG, "2");
+        if (read.getString("serverUrl",null)!=null){
+            serverUrl = read.getString("serverUrl",null);
+        }
         TextView v1 = findViewById(R.id.editText1);
         TextView v2 = findViewById(R.id.editText2);
         v1.setText(phoneNum1);
         v2.setText(phoneNum2);
         ToggleButton tb = findViewById(R.id.button);
-        TextView messageVw = findViewById(R.id.myTextView);
+        sp_dropdown = findViewById(R.id.sp_dropdown);
+        //声明一个下拉列表的数组适配器// 第一个参数：上下文，第二个参数：条目布局，第三个参数：要显示的数据
+        ArrayAdapter<String> startAdapter = new ArrayAdapter<>(this, R.layout.item_select, starArray);
 
-        //在类里声明一个Handler
+        //将适配器给Spinner
+        sp_dropdown.setAdapter(startAdapter);
+
+        //设置下拉框默认显示第一项
+        int position = 0;
+        for (int i = 0; i < starArray.length; i++) {
+            if (starArray[i] == serverUrl) {
+                position = i;
+                break;
+            }
+        }
 
 
-// 在Service中读取数据
+        sp_dropdown.setSelection(position);
+//给下拉框设置选择监听器，一旦用户选中某一项，就触发监听器的onItemSelected方法
+        sp_dropdown.setOnItemSelectedListener(this);
+
 
 
 
@@ -92,16 +120,19 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 TextView pn = findViewById(R.id.editText1);
                 TextView httpUrl = findViewById(R.id.editText2);
+
                 if (tb.isChecked()){
                     Intent service = new Intent(getApplicationContext(), MyService.class);
                     SharedPreferences.Editor editor = getSharedPreferences("info",MODE_PRIVATE).edit();
                     editor.putString("phoneNum1",pn.getText().toString());
                     editor.putString("phoneNum2",httpUrl.getText().toString());
+                    editor.putString("serverUrl", serverUrl);
                     editor.apply();
                     service.putExtra("phoneNum1",pn.getText().toString());
                     service.putExtra("phoneNum2",httpUrl.getText().toString());
+                    service.putExtra("serverUrl", serverUrl);
 
-                                        Log.i(TAG, "服务start"  + Build.VERSION.SDK_INT);
+                    Log.i(TAG, "服务start"  + Build.VERSION.SDK_INT);
                     Log.i(TAG, "服务start"  + Build.VERSION_CODES.O);
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -142,4 +173,13 @@ public class MainActivity extends AppCompatActivity {
         this.stopService(service);
     }
 
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+        serverUrl = starArray[position];
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+
+    }
 }
