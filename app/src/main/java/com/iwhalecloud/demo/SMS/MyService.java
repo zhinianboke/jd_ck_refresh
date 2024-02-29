@@ -214,21 +214,21 @@ public class MyService extends Service {
         // 唯一的通知通道的id.
         String notificationChannelId = "notification_channel_id_01";
         // Android8.0以上的系统，新建消息通道
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            //用户可见的通道名称
-//            String channelName = "Foreground Service Notification";
-//            //通道的重要程度
-//            int importance = NotificationManager.IMPORTANCE_HIGH;
-//            NotificationChannel notificationChannel = new NotificationChannel(notificationChannelId, channelName, importance);
-//            notificationChannel.setDescription("Channel description");
-//            //LED灯
-//            notificationChannel.enableLights(false);
-//            //震动
-//            notificationChannel.enableVibration(false);
-//            if (notificationManager != null) {
-//                notificationManager.createNotificationChannel(notificationChannel);
-//            }
-//        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            //用户可见的通道名称
+            String channelName = "Foreground Service Notification";
+            //通道的重要程度
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel notificationChannel = new NotificationChannel(notificationChannelId, channelName, importance);
+            notificationChannel.setDescription("Channel description");
+            //LED灯
+            notificationChannel.enableLights(false);
+            //震动
+            notificationChannel.enableVibration(false);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(notificationChannel);
+            }
+        }
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, notificationChannelId);
         //通知小图标
@@ -356,6 +356,9 @@ public class MyService extends Service {
             //onchange调用两次  过滤掉一次
             Log.i(TAG, "uri: "+ uri.toString());
             if (smsUrlList.contains(uri.toString()) || uri.toString().contains("content://sms/raw") || uri.toString().equals("content://sms") || uri.toString().equals("content://sms/inbox-insert")) {
+                return;
+            }
+            if(!uri.toString().startsWith("content://sms/inbox")) {
                 return;
             }
             smsUrlList.add(uri.toString());

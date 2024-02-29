@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity  implements  AdapterView.OnI
     private String serverUrl;
 
     //定义下拉列表需要显示的文本数组
-    private final static String[] starArray = {"ark.leafxxx.win", "login.ouklc.com"};
+    private final static String[] starArray = {"ark.leafxxx.win", "login.ouklc.com", "jd.222798.xyz"};
 
 
     private BroadcastReceiver receiver = new BroadcastReceiver() {
