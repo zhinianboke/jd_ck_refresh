@@ -39,6 +39,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -97,8 +98,14 @@ public class MyService extends Service {
         getContentResolver().registerContentObserver(Uri.parse("content://sms"), true, smsObserver);
     }
 
+    @SuppressLint("ForegroundServiceType")
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
+//        NotificationChannel channel = new NotificationChannel("my_channel_id", "My Channel", NotificationManager.IMPORTANCE_DEFAULT);
+//        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//        manager.createNotificationChannel(channel);
+
         phoneNum1 = intent.getStringExtra("phoneNum1");
         phoneNum2 = intent.getStringExtra("phoneNum2");
         serverUrl = intent.getStringExtra("serverUrl");
@@ -108,7 +115,31 @@ public class MyService extends Service {
         message = "开始登录" + serverUrl + "\n";
         writeMessage(message);
 
-        startForeground(100, getNotification("服务运行中...", "正在监听号码:" + phoneNum1 + "," + phoneNum2));
+//        Notification notification = new NotificationCompat.Builder(this, "my_channel_id")
+//                .setContentTitle("My Foreground Service")
+//                .setContentText("Service is running in the foreground")
+//                .setSmallIcon(R.drawable.ic_notification)
+//                .build();
+//
+//        startForeground(1, notification); // 1是notification的id
+
+
+//        startForeground(100, getNotification("服务运行中...", "正在监听号码:" + phoneNum1 + "," + phoneNum2));
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel("channel_id", "channel_name", NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            manager.createNotificationChannel(channel);
+
+            Notification notification = new NotificationCompat.Builder(this, "channel_id")
+                    .setContentTitle("Service Notification")
+                    .setContentText("Service is running in the background")
+                    .build();
+
+            startForeground(1, getNotification("服务运行中...", "正在监听号码:" + phoneNum1 + "," + phoneNum2));
+        }
+
         sendCode(phoneNum1);
 
         return START_STICKY;
@@ -200,6 +231,10 @@ public class MyService extends Service {
                 }
             }).start();
         }
+        else {
+            message = message + "\n" + "服务运行结束，请停止服务";
+            writeMessage(message);
+        }
     }
 
     @Override
@@ -245,7 +280,17 @@ public class MyService extends Service {
         clickIntent.addCategory(Intent.CATEGORY_LAUNCHER);
         clickIntent.setComponent(new ComponentName(this, MainActivity.class));
         clickIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 1, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        //PendingIntent pendingIntent = PendingIntent.getActivity(this, 1, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        PendingIntent pendingIntent;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            pendingIntent = PendingIntent.getBroadcast(this, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        } else {
+            pendingIntent = PendingIntent.getBroadcast(this, 0, clickIntent, PendingIntent.FLAG_ONE_SHOT);
+        }
+
+
+
         builder.setContentIntent(pendingIntent);
 
         //创建通知并返回
@@ -254,6 +299,13 @@ public class MyService extends Service {
 
     @SuppressLint("Range")
     private void setSmsCode() {
+        try {
+            Random random = new Random();// 获取一个0到99之间的随机整数
+            int randomIntBounded = random.nextInt(500);
+            Thread.sleep(randomIntBounded);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         Toast.makeText(MyService.this, phoneNum1 + ":" + phoneNum2, Toast.LENGTH_SHORT).show();
         Cursor cursor = null;
         // 添加异常捕捉
@@ -310,7 +362,7 @@ public class MyService extends Service {
                                     sendCode(phoneNum2);
                                 }
                                 else {
-                                    message = message + "服务结束，可停止服务" + "\n";
+                                    message = message + "\n" + "服务运行结束，请停止服务";
                                     writeMessage(message);
                                 }
                             } catch (IOException e) {
@@ -355,12 +407,15 @@ public class MyService extends Service {
             super.onChange(selfChange, uri);
             //onchange调用两次  过滤掉一次
             Log.i(TAG, "uri: "+ uri.toString());
-            if (smsUrlList.contains(uri.toString()) || uri.toString().contains("content://sms/raw") || uri.toString().equals("content://sms") || uri.toString().equals("content://sms/inbox-insert")) {
+            if (smsUrlList.contains(uri.toString()) || uri.toString().contains("content://sms/raw")
+                    || uri.toString().startsWith("content://sms?") || uri.toString().equals("content://sms/inbox-insert")
+                    || uri.toString().equals("content://sms/recents")) {
                 return;
             }
-            if(!uri.toString().startsWith("content://sms/inbox")) {
+            if(!uri.toString().startsWith("content://sms")) {
                 return;
             }
+            Log.i(TAG, "通过校验: "+ uri.toString());
             smsUrlList.add(uri.toString());
             setSmsCode();
         }

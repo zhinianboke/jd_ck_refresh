@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity  implements  AdapterView.OnI
 
 
         IntentFilter filter = new IntentFilter("com.gdp2852.demo.service.broadcast");
-        registerReceiver(receiver, filter);
+        registerReceiver(receiver, filter, RECEIVER_EXPORTED);
 
 
 
@@ -135,9 +135,20 @@ public class MainActivity extends AppCompatActivity  implements  AdapterView.OnI
                     Log.i(TAG, "服务start"  + Build.VERSION.SDK_INT);
                     Log.i(TAG, "服务start"  + Build.VERSION_CODES.O);
 
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                        MainActivity.this.startService(service);
+//                    }
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        // 在Android Oreo及以上版本需要这样调用
+                        MainActivity.this.startForegroundService(service);
+                    } else {
+                        // 对于旧版本的Android，可以直接调用
                         MainActivity.this.startService(service);
                     }
+
+
+
+
                     pn.setEnabled(false);
                     httpUrl.setEnabled(false);
                     Log.i(TAG, "服务开启");
