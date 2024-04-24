@@ -17,6 +17,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -81,8 +83,30 @@ public class MainActivity extends AppCompatActivity  implements  AdapterView.OnI
         }
         TextView v1 = findViewById(R.id.editText1);
         TextView v2 = findViewById(R.id.editText2);
+        TextView v3 = findViewById(R.id.editText3);
         v1.setText(phoneNum1);
         v2.setText(phoneNum2);
+        v3.setText(serverUrl);
+
+        v3.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // 文字改变之前的处理
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // 文字正在改变的处理
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // 文字改变之后的处理
+                serverUrl = v3.getText().toString();
+            }
+        });
+
+
         ToggleButton tb = findViewById(R.id.button);
         sp_dropdown = findViewById(R.id.sp_dropdown);
         //声明一个下拉列表的数组适配器// 第一个参数：上下文，第二个参数：条目布局，第三个参数：要显示的数据
@@ -121,6 +145,7 @@ public class MainActivity extends AppCompatActivity  implements  AdapterView.OnI
                 TextView pn = findViewById(R.id.editText1);
                 TextView httpUrl = findViewById(R.id.editText2);
 
+                TextView server = findViewById(R.id.editText3);
                 if (tb.isChecked()){
                     Intent service = new Intent(getApplicationContext(), MyService.class);
                     SharedPreferences.Editor editor = getSharedPreferences("info",MODE_PRIVATE).edit();
@@ -151,6 +176,7 @@ public class MainActivity extends AppCompatActivity  implements  AdapterView.OnI
 
                     pn.setEnabled(false);
                     httpUrl.setEnabled(false);
+                    server.setEnabled(false);
                     Log.i(TAG, "服务开启");
                     Toast.makeText(MainActivity.this,"服务开启",Toast.LENGTH_SHORT).show();
                 }else {
@@ -158,6 +184,7 @@ public class MainActivity extends AppCompatActivity  implements  AdapterView.OnI
                     MainActivity.this.stopService(service);
                     pn.setEnabled(true);
                     httpUrl.setEnabled(true);
+                    server.setEnabled(true);
                     Toast.makeText(MainActivity.this,"服务停止",Toast.LENGTH_SHORT).show();
                 }
             }
@@ -187,6 +214,9 @@ public class MainActivity extends AppCompatActivity  implements  AdapterView.OnI
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
         serverUrl = starArray[position];
+
+        TextView v3 = findViewById(R.id.editText3);
+        v3.setText(serverUrl);
     }
 
     @Override

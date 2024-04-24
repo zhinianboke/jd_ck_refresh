@@ -5,6 +5,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
+    <EditText
+        android:id="@+id/editText3"
+        android:layout_width="295dp"
+        android:layout_height="58dp"
+        android:hint="自定义车队，填写后下拉框失效"
+        android:textColorHint="#95A1AA"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.465"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.05" />
+
     <EditText
         android:id="@+id/editText1"
         android:layout_width="295dp"
@@ -75,7 +89,7 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="1.1.2版本"
+        android:text="1.1.4版本"
         tools:layout_editor_absoluteX="64dp"
         tools:layout_editor_absoluteY="38dp" />
 
