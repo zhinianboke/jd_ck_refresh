@@ -54,6 +54,8 @@ public class MainActivity extends AppCompatActivity  implements  AdapterView.OnI
 
     private String serverUrl;
 
+    private Boolean isInit = true;
+
     //定义下拉列表需要显示的文本数组
     private final static String[] starArray = {"ark.leafxxx.win", "login.ouklc.com", "jd.222798.xyz"};
 
@@ -216,7 +218,14 @@ public class MainActivity extends AppCompatActivity  implements  AdapterView.OnI
         serverUrl = starArray[position];
 
         TextView v3 = findViewById(R.id.editText3);
-        v3.setText(serverUrl);
+        String selfUrl = v3.getText().toString();
+        if(!serverUrl.equals(selfUrl) && !isInit) {
+            v3.setText(serverUrl);
+        }
+        else if(!selfUrl.isEmpty()){
+            serverUrl = selfUrl;
+        }
+        isInit = false;
     }
 
     @Override

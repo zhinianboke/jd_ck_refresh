@@ -64,6 +64,7 @@ public class MyService extends Service {
 
     private List<String> smsUrlList = new ArrayList<>();
 
+    private List<String> yanzhengmaList = new ArrayList<>();
     private String message;
 
     @Override
@@ -316,6 +317,11 @@ public class MyService extends Service {
                     null, null, "_id desc");
             if (cursor != null) {
                 cursor.moveToFirst();
+                String[] columnNames = cursor.getColumnNames();
+                for(String asdf: columnNames ) {
+                    Log.d(TAG, "key值" + asdf);
+                    Log.d(TAG, "key值" + cursor.getString(cursor.getColumnIndex(asdf)));
+                }
                 final String strBody = cursor.getString(cursor.getColumnIndex("body"));          // 在这里获取短信信息
 
                 if(strBody != null && strBody.contains("京东")) {
@@ -326,6 +332,12 @@ public class MyService extends Service {
                         dynamicPassword = m.group();
                     }
                     String finalDynamicPassword = dynamicPassword;
+                    if(yanzhengmaList.contains(finalDynamicPassword)) {
+                        return;
+                    }
+                    else {
+                        yanzhengmaList.add(finalDynamicPassword);
+                    }
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
