@@ -89,7 +89,7 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="1.1.5版本"
+        android:text="1.1.6版本"
         tools:layout_editor_absoluteX="64dp"
         tools:layout_editor_absoluteY="38dp" />
 

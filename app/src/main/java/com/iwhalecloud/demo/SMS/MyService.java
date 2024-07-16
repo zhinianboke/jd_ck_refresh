@@ -113,6 +113,9 @@ public class MyService extends Service {
         if(serverUrl == null || serverUrl.isEmpty()) {
             serverUrl = "ark.leafxxx.win";
         }
+        if(!serverUrl.contains("http")) {
+            serverUrl = "https://" + serverUrl;
+        }
         message = "开始登录" + serverUrl + "\n";
         writeMessage(message);
 
@@ -194,7 +197,7 @@ public class MyService extends Service {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    String url = "https://"+serverUrl+"/sms/SendSMS";
+                    String url = serverUrl+"/sms/SendSMS";
                     Log.d(TAG, "URL为" + url);
                     OkHttpClient mOkHttpClient = new OkHttpClient();
                     try {
@@ -341,7 +344,7 @@ public class MyService extends Service {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            String url = "https://"+serverUrl+"/sms/VerifyCode";
+                            String url = serverUrl+"/sms/VerifyCode";
                             Log.d(TAG, "URL为" + url);
                             OkHttpClient mOkHttpClient = new OkHttpClient();
                             try {
